@@ -37,7 +37,7 @@ class QcommerceEcommercePaynlServiceProvider extends PluginServiceProvider
 
         ecommerce()->builder(
             'paymentServiceProviders',
-            array_merge(cms()->builder('paymentServiceProviders'), [
+            array_merge(ecommerce()->builder('paymentServiceProviders'), [
                 'paynl' => [
                     'name' => 'PayNL',
                     'class' => PayNL::class,
@@ -47,9 +47,9 @@ class QcommerceEcommercePaynlServiceProvider extends PluginServiceProvider
 
         $package
             ->name('qcommerce-ecommerce-paynl')
-        ->hasCommands([
-            SyncPayNLPaymentMethods::class,
-        ]);
+            ->hasCommands([
+                SyncPayNLPaymentMethods::class,
+            ]);
     }
 
     protected function getPages(): array
