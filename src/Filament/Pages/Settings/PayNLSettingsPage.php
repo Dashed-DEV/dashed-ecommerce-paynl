@@ -51,7 +51,7 @@ class PayNLSettingsPage extends Page implements HasForms
                         'lg' => 2,
                     ]),
                 Placeholder::make('label')
-                    ->label("Webwinkelkeur is " . (!Customsetting::get('webwinkelkeur_connected', $site['id'], 0) ? 'niet' : '') . ' geconnect')
+                    ->label("Webwinkelkeur is " . (! Customsetting::get('webwinkelkeur_connected', $site['id'], 0) ? 'niet' : '') . ' geconnect')
                     ->content(Customsetting::get('webwinkelkeur_connection_error', $site['id'], ''))
                     ->columnSpan([
                         'default' => 1,
