@@ -3,8 +3,6 @@
 namespace Qubiqx\QcommerceEcommercePaynl\Commands;
 
 use Illuminate\Console\Command;
-use Qubiqx\QcommerceCore\Classes\Sitemap;
-use Qubiqx\QcommerceCore\Jobs\Sitemap\CreateSitemapJob;
 use Qubiqx\QcommerceEcommercePaynl\Classes\PayNL;
 
 class SyncPayNLPaymentMethods extends Command

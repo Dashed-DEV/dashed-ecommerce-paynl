@@ -13,7 +13,6 @@ use Filament\Pages\Page;
 use Qubiqx\QcommerceCore\Classes\Sites;
 use Qubiqx\QcommerceCore\Models\Customsetting;
 use Qubiqx\QcommerceEcommercePaynl\Classes\PayNL;
-use Qubiqx\QcommerceEcommerceWebwinkelkeur\Classes\Webwinkelkeur;
 
 class PayNLSettingsPage extends Page implements HasForms
 {
@@ -31,7 +30,7 @@ class PayNLSettingsPage extends Page implements HasForms
         foreach ($sites as $site) {
             $formData["paynl_at_hash_{$site['id']}"] = Customsetting::get('paynl_at_hash', $site['id']);
             $formData["paynl_sl_code_{$site['id']}"] = Customsetting::get('paynl_sl_code', $site['id']);
-            $formData["paynl_test_mode_{$site['id']}"] = Customsetting::get('paynl_test_mode', $site['id'], false)  ? true : false;
+            $formData["paynl_test_mode_{$site['id']}"] = Customsetting::get('paynl_test_mode', $site['id'], false) ? true : false;
             $formData["paynl_connected_{$site['id']}"] = Customsetting::get('paynl_connected', $site['id']);
         }
 
@@ -97,7 +96,7 @@ class PayNLSettingsPage extends Page implements HasForms
             Customsetting::set('paynl_test_mode', $this->form->getState()["paynl_test_mode_{$site['id']}"], $site['id']);
             Customsetting::set('paynl_connected', PayNL::isConnected($site['id']), $site['id']);
 
-            if(Customsetting::get('paynl_connected', $site['id'])){
+            if (Customsetting::get('paynl_connected', $site['id'])) {
                 PayNL::syncPaymentMethods($site['id']);
             }
         }
