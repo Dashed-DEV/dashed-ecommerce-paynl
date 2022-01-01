@@ -2,11 +2,11 @@
 
 namespace Qubiqx\QcommerceEcommercePaynl\Classes;
 
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Qubiqx\QcommerceCore\Classes\Locales;
 use Qubiqx\QcommerceCore\Classes\Sites;
 use Qubiqx\QcommerceCore\Models\Customsetting;
+use Qubiqx\QcommerceCore\Models\Translation;
 use Qubiqx\QcommerceEcommerceCore\Classes\Countries;
 use Qubiqx\QcommerceEcommerceCore\Models\OrderPayment;
 use Qubiqx\QcommerceEcommerceCore\Models\PaymentMethod;
@@ -19,7 +19,6 @@ class PayNL
             $siteId = Sites::getActive();
         }
 
-//        \Paynl\Config::setTokenCode(Customsetting::get('paynl_at_code', $siteId));
         \Paynl\Config::setApiToken(Customsetting::get('paynl_at_hash', $siteId));
         \Paynl\Config::setServiceId(Customsetting::get('paynl_sl_code', $siteId));
     }
@@ -72,38 +71,6 @@ class PayNL
         }
     }
 
-//    public static function getPaymentMethods($siteId = null, $cache = true)
-//    {
-//        $site = Sites::get($siteId);
-//
-//        self::initialize($siteId);
-//
-//        if (!Customsetting::get('paynl_connected', $site['id'])) {
-//            return;
-//        }
-//
-//        if (!$cache) {
-//            Cache::forget('paynl-payment-methods-' . $site['id']);
-//        }
-//
-//        $paymentMethods = Cache::remember('paynl-payment-methods-' . $site['id'], 60 * 60 * 24, function () use ($site) {
-//            $allPaymentMethods = \Paynl\Paymentmethods::getList();
-//            $paymentMethods = [];
-//            foreach ($allPaymentMethods as $paymentMethod) {
-//                $paymentMethod['active'] = Customsetting::get('paynl_payment_method_' . $paymentMethod['id'], $site['id'], 0) ? true : false;
-//                $paymentMethod['postpay'] = Customsetting::get('paynl_payment_method_postpay_' . $paymentMethod['id'], $site['id'], 0) ? true : false;
-//                $paymentMethod['costs'] = Customsetting::get('paynl_payment_method_costs_' . $paymentMethod['id'], $site['id'], 0);
-//                $paymentMethod['additional_info'] = Customsetting::get('paynl_payment_method_additional_info_' . $paymentMethod['id'], $site['id']);
-//                $paymentMethod['payment_instructions'] = Customsetting::get('paynl_payment_method_payment_instructions_' . $paymentMethod['id'], $site['id']);
-//                $paymentMethods[] = $paymentMethod;
-//            }
-//
-//            return $paymentMethods;
-//        });
-//
-//        return $paymentMethods;
-//    }
-
     public static function startTransaction(OrderPayment $orderPayment)
     {
         $orderPayment->psp = 'paynl';
@@ -132,7 +99,7 @@ class PayNL
             'amount' => number_format($orderPayment->amount, 2, '.', ''),
             'returnUrl' => route('qcommerce.frontend.checkout.complete') . '?orderId=' . $orderPayment->order->hash . '&paymentId=' . $orderPayment->hash,
             'ipaddress' => request()->ip(),
-            'paymentMethod' => str_replace('paynl_', '', $orderPayment->psp_payment_method_id),
+            'paymentMethod' => $orderPayment->paymentMethod->psp_id,
             'currency' => 'EUR',
             'testmode' => Customsetting::get('paynl_test_mode', $siteId, false) ? true : false,
 
@@ -173,7 +140,10 @@ class PayNL
         $orderPayment->psp_id = $result->getTransactionId();
         $orderPayment->save();
 
-        return $result;
+        return [
+            'transaction' => $result,
+            'redirectUrl' => $result->getRedirectUrl()
+        ];
     }
 
     public static function getOrderStatus(OrderPayment $orderPayment)
