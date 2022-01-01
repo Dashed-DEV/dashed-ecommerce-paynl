@@ -5,7 +5,7 @@ namespace Qubiqx\QcommerceEcommercePaynl;
 use Filament\PluginServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 use Qubiqx\QcommerceEcommercePaynl\Classes\PayNL;
-use Qubiqx\QcommerceEcommercePaynl\Commands\SyncPayNLPaymentMethods;
+use Qubiqx\QcommerceEcommercePaynl\Commands\SyncPayNLPaymentMethodsCommand;
 use Qubiqx\QcommerceEcommercePaynl\Filament\Pages\Settings\PayNLSettingsPage;
 use Spatie\LaravelPackageTools\Package;
 
@@ -17,7 +17,7 @@ class QcommerceEcommercePaynlServiceProvider extends PluginServiceProvider
     {
         $this->app->booted(function () {
             $schedule = app(Schedule::class);
-            $schedule->command(SyncPayNLPaymentMethods::class)->daily();
+            $schedule->command(SyncPayNLPaymentMethodsCommand::class)->daily();
         });
     }
 
@@ -48,7 +48,7 @@ class QcommerceEcommercePaynlServiceProvider extends PluginServiceProvider
         $package
             ->name('qcommerce-ecommerce-paynl')
             ->hasCommands([
-                SyncPayNLPaymentMethods::class,
+                SyncPayNLPaymentMethodsCommand::class,
             ]);
     }
 

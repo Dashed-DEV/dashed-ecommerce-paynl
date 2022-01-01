@@ -5,7 +5,7 @@ namespace Qubiqx\QcommerceEcommercePaynl\Commands;
 use Illuminate\Console\Command;
 use Qubiqx\QcommerceEcommercePaynl\Classes\PayNL;
 
-class SyncPayNLPaymentMethods extends Command
+class SyncPayNLPaymentMethodsCommand extends Command
 {
     /**
      * The name and signature of the console command.
