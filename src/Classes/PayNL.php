@@ -142,7 +142,7 @@ class PayNL
 
         return [
             'transaction' => $result,
-            'redirectUrl' => $result->getRedirectUrl()
+            'redirectUrl' => $result->getRedirectUrl(),
         ];
     }
 
