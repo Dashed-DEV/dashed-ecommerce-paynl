@@ -105,7 +105,7 @@ class PayNL
 
             'exchangeUrl' => route('qcommerce.frontend.checkout.exchange'),
             'description' => Translation::get('order-by-store', 'orders', 'Order by :storeName:', 'text', [
-                'storeName' => Customsetting::get('store_name'),
+                'storeName' => Customsetting::get('site_name'),
             ]),
             'orderNumber' => $orderPayment->order->id,
             'products' => $paynlProducts,
