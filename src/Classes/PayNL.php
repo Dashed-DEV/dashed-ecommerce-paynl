@@ -3,11 +3,11 @@
 namespace Qubiqx\QcommerceEcommercePaynl\Classes;
 
 use Illuminate\Support\Facades\Storage;
-use Qubiqx\QcommerceCore\Classes\Locales;
 use Qubiqx\QcommerceCore\Classes\Sites;
+use Qubiqx\QcommerceCore\Classes\Locales;
 use Qubiqx\QcommerceCore\Models\Customsetting;
-use Qubiqx\QcommerceCore\Models\Translation;
 use Qubiqx\QcommerceEcommerceCore\Classes\Countries;
+use Qubiqx\QcommerceTranslations\Models\Translation;
 use Qubiqx\QcommerceEcommerceCore\Models\OrderPayment;
 use Qubiqx\QcommerceEcommerceCore\Models\PaymentMethod;
 
@@ -157,7 +157,7 @@ class PayNL
         if ($payment->isPaid()) {
             return 'paid';
         } elseif ($payment->isRefunded(true)) {
-            return '';
+            return 'refunded';
         } elseif ($payment->isCancelled()) {
             return 'cancelled';
         } else {
