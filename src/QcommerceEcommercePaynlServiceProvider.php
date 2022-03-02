@@ -3,11 +3,11 @@
 namespace Qubiqx\QcommerceEcommercePaynl;
 
 use Filament\PluginServiceProvider;
-use Spatie\LaravelPackageTools\Package;
 use Illuminate\Console\Scheduling\Schedule;
 use Qubiqx\QcommerceEcommercePaynl\Classes\PayNL;
 use Qubiqx\QcommerceEcommercePaynl\Commands\SyncPayNLPaymentMethodsCommand;
 use Qubiqx\QcommerceEcommercePaynl\Filament\Pages\Settings\PayNLSettingsPage;
+use Spatie\LaravelPackageTools\Package;
 
 class QcommerceEcommercePaynlServiceProvider extends PluginServiceProvider
 {
