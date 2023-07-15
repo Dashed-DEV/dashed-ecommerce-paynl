@@ -26,7 +26,7 @@
         "pestphp/pest": "^2.8",
         "pestphp/pest-plugin-laravel": "^2.0",
         "phpunit/phpunit": "^10.2",
-        "spatie/laravel-ray": "^1.32",
+        "spatie/laravel-ray": "^1.32"
     },
     "autoload": {
         "psr-4": {
@@ -45,7 +45,10 @@
         "test-coverage": "vendor/bin/pest coverage"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     },
     "extra": {
         "laravel": {
