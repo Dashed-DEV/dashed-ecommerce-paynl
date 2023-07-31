@@ -60,7 +60,7 @@ class PayNL
         foreach ($allPaymentMethods as $allPaymentMethod) {
             if (! PaymentMethod::where('psp', 'paynl')->where('psp_id', $allPaymentMethod['id'])->count()) {
                 $image = file_get_contents('https://static.pay.nl/' . $allPaymentMethod['brand']['image']);
-                $imagePath = '/qcommerce/payment-methods/' . $allPaymentMethod['id'] . '.png';
+                $imagePath = '/qcommerce/payment-methods/paynl/' . $allPaymentMethod['id'] . '.png';
                 Storage::put($imagePath, $image);
 
                 $paymentMethod = new PaymentMethod();
