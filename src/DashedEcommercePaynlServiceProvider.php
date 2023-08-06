@@ -1,17 +1,17 @@
 <?php
 
-namespace Qubiqx\QcommerceEcommercePaynl;
+namespace Dashed\DashedEcommercePaynl;
 
 use Filament\PluginServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
-use Qubiqx\QcommerceEcommercePaynl\Classes\PayNL;
-use Qubiqx\QcommerceEcommercePaynl\Commands\SyncPayNLPaymentMethodsCommand;
-use Qubiqx\QcommerceEcommercePaynl\Filament\Pages\Settings\PayNLSettingsPage;
+use Dashed\DashedEcommercePaynl\Classes\PayNL;
+use Dashed\DashedEcommercePaynl\Commands\SyncPayNLPaymentMethodsCommand;
+use Dashed\DashedEcommercePaynl\Filament\Pages\Settings\PayNLSettingsPage;
 use Spatie\LaravelPackageTools\Package;
 
-class QcommerceEcommercePaynlServiceProvider extends PluginServiceProvider
+class DashedEcommercePaynlServiceProvider extends PluginServiceProvider
 {
-    public static string $name = 'qcommerce-ecommerce-paynl';
+    public static string $name = 'dashed-ecommerce-paynl';
 
     public function bootingPackage()
     {
@@ -46,7 +46,7 @@ class QcommerceEcommercePaynlServiceProvider extends PluginServiceProvider
         );
 
         $package
-            ->name('qcommerce-ecommerce-paynl')
+            ->name('dashed-ecommerce-paynl')
             ->hasCommands([
                 SyncPayNLPaymentMethodsCommand::class,
             ]);

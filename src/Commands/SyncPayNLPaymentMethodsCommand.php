@@ -1,9 +1,9 @@
 <?php
 
-namespace Qubiqx\QcommerceEcommercePaynl\Commands;
+namespace Dashed\DashedEcommercePaynl\Commands;
 
 use Illuminate\Console\Command;
-use Qubiqx\QcommerceEcommercePaynl\Classes\PayNL;
+use Dashed\DashedEcommercePaynl\Classes\PayNL;
 
 class SyncPayNLPaymentMethodsCommand extends Command
 {
@@ -12,7 +12,7 @@ class SyncPayNLPaymentMethodsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'qcommerce:sync-paynl-payment-methods';
+    protected $signature = 'dashed:sync-paynl-payment-methods';
 
     /**
      * The console command description.

@@ -1,17 +1,17 @@
 {
-    "name": "qubiqx/qcommerce-ecommerce-paynl",
-    "description": "This is my package qcommerce-ecommerce-paynl",
+    "name": "dashed/dashed-ecommerce-paynl",
+    "description": "This is my package dashed-ecommerce-paynl",
     "keywords": [
-        "Qubiqx",
+        "Dashed",
         "laravel",
-        "qcommerce-ecommerce-paynl"
+        "dashed-ecommerce-paynl"
     ],
-    "homepage": "https://github.com/qubiqx/qcommerce-ecommerce-paynl",
+    "homepage": "https://github.com/Dashed-DEV/dashed-ecommerce-paynl",
     "license": "MIT",
     "authors": [
         {
             "name": "Robin van Maasakker",
-            "email": "robin@qubiqx.com",
+            "email": "robin@dashed.nl",
             "role": "Developer"
         }
     ],
@@ -30,13 +30,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Qubiqx\\QcommerceEcommercePaynl\\": "src",
-            "Qubiqx\\QcommerceEcommercePaynl\\Database\\Factories\\": "database/factories"
+            "Dashed\\DashedEcommercePaynl\\": "src",
+            "Dashed\\DashedEcommercePaynl\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Qubiqx\\QcommerceEcommercePaynl\\Tests\\": "tests"
+            "Dashed\\DashedEcommercePaynl\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -53,10 +53,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Qubiqx\\QcommerceEcommercePaynl\\QcommerceEcommercePaynlServiceProvider"
+                "Dashed\\DashedEcommercePaynl\\DashedEcommercePaynlServiceProvider"
             ],
             "aliases": {
-                "QcommerceEcommercePaynl": "Qubiqx\\QcommerceEcommercePaynl\\Facades\\QcommerceEcommercePaynl"
+                "DashedEcommercePaynl": "Dashed\\DashedEcommercePaynl\\Facades\\DashedEcommercePaynl"
             }
         }
     },

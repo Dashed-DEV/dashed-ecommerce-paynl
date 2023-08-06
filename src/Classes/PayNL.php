@@ -1,16 +1,16 @@
 <?php
 
-namespace Qubiqx\QcommerceEcommercePaynl\Classes;
+namespace Dashed\DashedEcommercePaynl\Classes;
 
 use Exception;
 use Illuminate\Support\Facades\Storage;
-use Qubiqx\QcommerceCore\Classes\Locales;
-use Qubiqx\QcommerceCore\Classes\Sites;
-use Qubiqx\QcommerceCore\Models\Customsetting;
-use Qubiqx\QcommerceEcommerceCore\Classes\Countries;
-use Qubiqx\QcommerceEcommerceCore\Models\OrderPayment;
-use Qubiqx\QcommerceEcommerceCore\Models\PaymentMethod;
-use Qubiqx\QcommerceTranslations\Models\Translation;
+use Dashed\DashedCore\Classes\Locales;
+use Dashed\DashedCore\Classes\Sites;
+use Dashed\DashedCore\Models\Customsetting;
+use Dashed\DashedEcommerceCore\Classes\Countries;
+use Dashed\DashedEcommerceCore\Models\OrderPayment;
+use Dashed\DashedEcommerceCore\Models\PaymentMethod;
+use Dashed\DashedTranslations\Models\Translation;
 
 class PayNL
 {
@@ -60,7 +60,7 @@ class PayNL
         foreach ($allPaymentMethods as $allPaymentMethod) {
             if (! PaymentMethod::where('psp', 'paynl')->where('psp_id', $allPaymentMethod['id'])->count()) {
                 $image = file_get_contents('https://static.pay.nl/' . $allPaymentMethod['brand']['image']);
-                $imagePath = '/qcommerce/payment-methods/paynl/' . $allPaymentMethod['id'] . '.png';
+                $imagePath = '/dashed/payment-methods/paynl/' . $allPaymentMethod['id'] . '.png';
                 Storage::put($imagePath, $image);
 
                 $paymentMethod = new PaymentMethod();
@@ -103,13 +103,13 @@ class PayNL
 
         $result = \Paynl\Transaction::start([
             'amount' => number_format($orderPayment->amount, 2, '.', ''),
-            'returnUrl' => route('qcommerce.frontend.checkout.complete') . '?orderId=' . $orderPayment->order->hash . '&paymentId=' . $orderPayment->hash,
+            'returnUrl' => route('dashed.frontend.checkout.complete') . '?orderId=' . $orderPayment->order->hash . '&paymentId=' . $orderPayment->hash,
             'ipaddress' => request()->ip(),
             'paymentMethod' => $orderPayment->paymentMethod->psp_id,
             'currency' => 'EUR',
             'testmode' => Customsetting::get('paynl_test_mode', $siteId, false) ? true : false,
 
-            'exchangeUrl' => route('qcommerce.frontend.checkout.exchange'),
+            'exchangeUrl' => route('dashed.frontend.checkout.exchange'),
             'description' => Translation::get('order-by-store', 'orders', 'Order by :storeName:', 'text', [
                 'storeName' => Customsetting::get('site_name'),
             ]),
