@@ -2,8 +2,6 @@
 
 namespace Dashed\DashedEcommercePaynl\Classes;
 
-use Exception;
-use Illuminate\Support\Facades\Storage;
 use Dashed\DashedCore\Classes\Locales;
 use Dashed\DashedCore\Classes\Sites;
 use Dashed\DashedCore\Models\Customsetting;
@@ -11,6 +9,8 @@ use Dashed\DashedEcommerceCore\Classes\Countries;
 use Dashed\DashedEcommerceCore\Models\OrderPayment;
 use Dashed\DashedEcommerceCore\Models\PaymentMethod;
 use Dashed\DashedTranslations\Models\Translation;
+use Exception;
+use Illuminate\Support\Facades\Storage;
 
 class PayNL
 {

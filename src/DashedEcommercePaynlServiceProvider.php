@@ -2,11 +2,11 @@
 
 namespace Dashed\DashedEcommercePaynl;
 
-use Filament\PluginServiceProvider;
-use Illuminate\Console\Scheduling\Schedule;
 use Dashed\DashedEcommercePaynl\Classes\PayNL;
 use Dashed\DashedEcommercePaynl\Commands\SyncPayNLPaymentMethodsCommand;
 use Dashed\DashedEcommercePaynl\Filament\Pages\Settings\PayNLSettingsPage;
+use Filament\PluginServiceProvider;
+use Illuminate\Console\Scheduling\Schedule;
 use Spatie\LaravelPackageTools\Package;
 
 class DashedEcommercePaynlServiceProvider extends PluginServiceProvider
