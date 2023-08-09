@@ -16,7 +16,7 @@ class PayNL
 {
     public static function initialize($siteId = null)
     {
-        if (! $siteId) {
+        if (!$siteId) {
             $siteId = Sites::getActive();
         }
 
@@ -26,7 +26,7 @@ class PayNL
 
     public static function isConnected($siteId = null)
     {
-        if (! $siteId) {
+        if (!$siteId) {
             $siteId = Sites::getActive();
         }
 
@@ -47,7 +47,7 @@ class PayNL
 
         self::initialize($siteId);
 
-        if (! Customsetting::get('paynl_connected', $site['id'])) {
+        if (!Customsetting::get('paynl_connected', $site['id'])) {
             return;
         }
 
@@ -58,7 +58,7 @@ class PayNL
         }
 
         foreach ($allPaymentMethods as $allPaymentMethod) {
-            if (! PaymentMethod::where('psp', 'paynl')->where('psp_id', $allPaymentMethod['id'])->count()) {
+            if (!PaymentMethod::where('psp', 'paynl')->where('psp_id', $allPaymentMethod['id'])->count()) {
                 $image = file_get_contents('https://static.pay.nl/' . $allPaymentMethod['brand']['image']);
                 $imagePath = '/dashed/payment-methods/paynl/' . $allPaymentMethod['id'] . '.png';
                 Storage::put($imagePath, $image);
@@ -152,13 +152,17 @@ class PayNL
         ];
     }
 
-    public static function getOrderStatus(OrderPayment $orderPayment)
+    public static function getOrderStatus(OrderPayment $orderPayment): string
     {
         $site = Sites::getActive();
 
         self::initialize($site);
 
-        $payment = \Paynl\Transaction::get($orderPayment->psp_id);
+        try {
+            $payment = \Paynl\Transaction::get($orderPayment->psp_id);
+        } catch (Exception $exception) {
+            return '';
+        }
 
         if ($payment->isPaid()) {
             return 'paid';
