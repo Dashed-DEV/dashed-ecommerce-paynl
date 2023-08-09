@@ -161,7 +161,7 @@ class PayNL
         try {
             $payment = \Paynl\Transaction::get($orderPayment->psp_id);
         } catch (Exception $exception) {
-            return '';
+            return 'pending';
         }
 
         if ($payment->isPaid()) {
