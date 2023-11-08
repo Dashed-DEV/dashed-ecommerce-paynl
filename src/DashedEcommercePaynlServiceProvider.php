@@ -2,14 +2,14 @@
 
 namespace Dashed\DashedEcommercePaynl;
 
+use Spatie\LaravelPackageTools\Package;
+use Illuminate\Console\Scheduling\Schedule;
 use Dashed\DashedEcommercePaynl\Classes\PayNL;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Dashed\DashedEcommercePaynl\Commands\SyncPayNLPaymentMethodsCommand;
 use Dashed\DashedEcommercePaynl\Filament\Pages\Settings\PayNLSettingsPage;
-use Filament\PluginServiceProvider;
-use Illuminate\Console\Scheduling\Schedule;
-use Spatie\LaravelPackageTools\Package;
 
-class DashedEcommercePaynlServiceProvider extends PluginServiceProvider
+class DashedEcommercePaynlServiceProvider extends PackageServiceProvider
 {
     public static string $name = 'dashed-ecommerce-paynl';
 
@@ -29,7 +29,7 @@ class DashedEcommercePaynlServiceProvider extends PluginServiceProvider
                 'paynl' => [
                     'name' => 'PayNL',
                     'description' => 'Link PayNL aan je webshop',
-                    'icon' => 'cash',
+                    'icon' => 'banknotes',
                     'page' => PayNLSettingsPage::class,
                 ],
             ])
@@ -50,12 +50,5 @@ class DashedEcommercePaynlServiceProvider extends PluginServiceProvider
             ->hasCommands([
                 SyncPayNLPaymentMethodsCommand::class,
             ]);
-    }
-
-    protected function getPages(): array
-    {
-        return array_merge(parent::getPages(), [
-            PayNLSettingsPage::class,
-        ]);
     }
 }

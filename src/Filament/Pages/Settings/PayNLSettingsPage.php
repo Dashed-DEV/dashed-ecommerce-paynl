@@ -2,26 +2,24 @@
 
 namespace Dashed\DashedEcommercePaynl\Filament\Pages\Settings;
 
-use Dashed\DashedCore\Classes\Sites;
-use Dashed\DashedCore\Models\Customsetting;
-use Dashed\DashedEcommercePaynl\Classes\PayNL;
-use Filament\Forms\Components\Placeholder;
+use Filament\Pages\Page;
 use Filament\Forms\Components\Tabs;
+use Dashed\DashedCore\Classes\Sites;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Pages\Page;
+use Filament\Notifications\Notification;
+use Filament\Forms\Components\Placeholder;
+use Dashed\DashedCore\Models\Customsetting;
+use Dashed\DashedEcommercePaynl\Classes\PayNL;
 
-class PayNLSettingsPage extends Page implements HasForms
+class PayNLSettingsPage extends Page
 {
-    use InteractsWithForms;
-
     protected static bool $shouldRegisterNavigation = false;
     protected static ?string $title = 'PayNL';
 
     protected static string $view = 'dashed-core::settings.pages.default-settings';
+    public array $data = [];
 
     public function mount(): void
     {
@@ -60,14 +58,10 @@ class PayNLSettingsPage extends Page implements HasForms
                     ]),
                 TextInput::make("paynl_at_hash_{$site['id']}")
                     ->label('PayNL AT hash')
-                    ->rules([
-                        'max:255',
-                    ]),
+                    ->maxLength(255),
                 TextInput::make("paynl_sl_code_{$site['id']}")
                     ->label('PayNL SL code')
-                    ->rules([
-                        'max:255',
-                    ]),
+                    ->maxLength(255),
                 Toggle::make("paynl_test_mode_{$site['id']}")
                     ->label('Testmodus activeren'),
             ];
@@ -86,6 +80,11 @@ class PayNLSettingsPage extends Page implements HasForms
         return $tabGroups;
     }
 
+    public function getFormStatePath(): ?string
+    {
+        return 'data';
+    }
+
     public function submit()
     {
         $sites = Sites::getSites();
@@ -101,7 +100,10 @@ class PayNLSettingsPage extends Page implements HasForms
             }
         }
 
-        $this->notify('success', 'De PayNL instellingen zijn opgeslagen');
+        Notification::make()
+            ->title('De PayNL instellingen zijn opgeslagen')
+            ->success()
+            ->send();
 
         return redirect(PayNLSettingsPage::getUrl());
     }
