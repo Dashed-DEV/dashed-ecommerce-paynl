@@ -2,8 +2,8 @@
 
 namespace Dashed\DashedEcommercePaynl\Commands;
 
-use Illuminate\Console\Command;
 use Dashed\DashedEcommercePaynl\Classes\PayNL;
+use Illuminate\Console\Command;
 
 class SyncPayNLPaymentMethodsCommand extends Command
 {
