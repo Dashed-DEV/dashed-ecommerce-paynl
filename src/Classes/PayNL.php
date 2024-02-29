@@ -59,7 +59,6 @@ class PayNL
 
         foreach ($allPaymentMethods as $allPaymentMethod) {
             if (! PaymentMethod::where('psp', 'paynl')->where('psp_id', $allPaymentMethod['id'])->count()) {
-
                 $paymentMethod = new PaymentMethod();
                 $paymentMethod->site_id = $site['id'];
                 $paymentMethod->available_from_amount = $allPaymentMethod['min_amount'] ?: 0;
@@ -68,6 +67,8 @@ class PayNL
                 foreach (Locales::getLocales() as $locale) {
                     $paymentMethod->setTranslation('name', $locale['id'], $allPaymentMethod['visibleName']);
                 }
+            }else{
+                $paymentMethod = PaymentMethod::where('psp', 'paynl')->where('psp_id', $allPaymentMethod['id'])->first();
             }
 
             $image = file_get_contents('https://static.pay.nl/' . $allPaymentMethod['brand']['image']);
