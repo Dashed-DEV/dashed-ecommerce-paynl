@@ -2,15 +2,15 @@
 
 namespace Dashed\DashedEcommercePaynl\Classes;
 
-use Dashed\DashedCore\Classes\Locales;
+use Exception;
 use Dashed\DashedCore\Classes\Sites;
+use Dashed\DashedCore\Classes\Locales;
+use Illuminate\Support\Facades\Storage;
 use Dashed\DashedCore\Models\Customsetting;
 use Dashed\DashedEcommerceCore\Classes\Countries;
+use Dashed\DashedTranslations\Models\Translation;
 use Dashed\DashedEcommerceCore\Models\OrderPayment;
 use Dashed\DashedEcommerceCore\Models\PaymentMethod;
-use Dashed\DashedTranslations\Models\Translation;
-use Exception;
-use Illuminate\Support\Facades\Storage;
 
 class PayNL
 {
@@ -61,7 +61,7 @@ class PayNL
             if (! PaymentMethod::where('psp', 'paynl')->where('psp_id', $allPaymentMethod['id'])->count()) {
                 $image = file_get_contents('https://static.pay.nl/' . $allPaymentMethod['brand']['image']);
                 $imagePath = '/dashed/payment-methods/paynl/' . $allPaymentMethod['id'] . '.png';
-                Storage::put($imagePath, $image);
+                Storage::disk('dashed')->put($imagePath, $image);
 
                 $paymentMethod = new PaymentMethod();
                 $paymentMethod->site_id = $site['id'];

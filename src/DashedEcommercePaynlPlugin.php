@@ -2,9 +2,9 @@
 
 namespace Dashed\DashedEcommercePaynl;
 
-use Dashed\DashedEcommercePaynl\Filament\Pages\Settings\PayNLSettingsPage;
-use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Filament\Contracts\Plugin;
+use Dashed\DashedEcommercePaynl\Filament\Pages\Settings\PayNLSettingsPage;
 
 class DashedEcommercePaynlPlugin implements Plugin
 {
