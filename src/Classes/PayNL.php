@@ -67,7 +67,7 @@ class PayNL
                 foreach (Locales::getLocales() as $locale) {
                     $paymentMethod->setTranslation('name', $locale['id'], $allPaymentMethod['visibleName']);
                 }
-            }else{
+            } else {
                 $paymentMethod = PaymentMethod::where('psp', 'paynl')->where('psp_id', $allPaymentMethod['id'])->first();
             }
 
