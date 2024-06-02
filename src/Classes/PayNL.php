@@ -78,7 +78,7 @@ class PayNL
             Storage::disk('dashed')->put($imagePath, $image);
 
             $folder = MediaLibraryFolder::where('name', 'pay')->first();
-            if (!$folder) {
+            if (! $folder) {
                 $folder->name = 'pay';
                 $folder->save();
             }
