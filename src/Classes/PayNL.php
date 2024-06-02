@@ -11,6 +11,8 @@ use Dashed\DashedEcommerceCore\Models\PaymentMethod;
 use Dashed\DashedTranslations\Models\Translation;
 use Exception;
 use Illuminate\Support\Facades\Storage;
+use RalphJSmit\Filament\MediaLibrary\Media\Models\MediaLibraryFolder;
+use RalphJSmit\Filament\MediaLibrary\Media\Models\MediaLibraryItem;
 
 class PayNL
 {
@@ -74,7 +76,22 @@ class PayNL
             $image = file_get_contents('https://static.pay.nl/' . $allPaymentMethod['brand']['image']);
             $imagePath = '/dashed/payment-methods/paynl/' . $allPaymentMethod['id'] . '.png';
             Storage::disk('dashed')->put($imagePath, $image);
-            $paymentMethod->image = $imagePath;
+
+            $folder = MediaLibraryFolder::where('name', 'pay')->first();
+            if (!$folder) {
+                $folder->name = 'pay';
+                $folder->save();
+            }
+            $filamentMediaLibraryItem = new MediaLibraryItem();
+            $filamentMediaLibraryItem->uploaded_by_user_id = null;
+            $filamentMediaLibraryItem->folder_id = $folder->id;
+            $filamentMediaLibraryItem->save();
+
+            $filamentMediaLibraryItem
+                ->addMediaFromDisk($imagePath, 'dashed')
+                ->toMediaCollection($filamentMediaLibraryItem->getMediaLibraryCollectionName());
+
+            $paymentMethod->image = $filamentMediaLibraryItem->id;
             $paymentMethod->save();
         }
     }
