@@ -79,6 +79,7 @@ class PayNL
 
             $folder = MediaLibraryFolder::where('name', 'pay')->first();
             if (! $folder) {
+                $folder = new MediaLibraryFolder();
                 $folder->name = 'pay';
                 $folder->save();
             }
