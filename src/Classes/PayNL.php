@@ -38,9 +38,11 @@ class PayNL
             $paymentMethods = \Paynl\Paymentmethods::getList();
 
             Customsetting::set('paynl_connection_error', null, $siteId);
+
             return true;
         } catch (\Exception $e) {
             Customsetting::set('paynl_connection_error', $e->getMessage(), $siteId);
+
             return false;
         }
     }
