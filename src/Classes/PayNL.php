@@ -2,30 +2,29 @@
 
 namespace Dashed\DashedEcommercePaynl\Classes;
 
-use Dashed\DashedEcommerceCore\Contracts\PaymentProviderContract;
-use Dashed\DashedEcommerceCore\Models\PinTerminal;
 use Exception;
+use Paynl\Instore;
 use Dashed\DashedCore\Classes\Sites;
-use Dashed\DashedCore\Classes\Locales;
 use Illuminate\Support\Facades\Http;
+use Dashed\DashedCore\Classes\Locales;
 use Illuminate\Support\Facades\Storage;
 use Dashed\DashedCore\Models\Customsetting;
 use Dashed\DashedEcommerceCore\Classes\Countries;
 use Dashed\DashedTranslations\Models\Translation;
+use Dashed\DashedEcommerceCore\Models\PinTerminal;
 use Dashed\DashedEcommerceCore\Models\OrderPayment;
 use Dashed\DashedEcommerceCore\Models\PaymentMethod;
-use Paynl\Instore;
-use Paynl\Result\Instore\Terminals;
+use Dashed\DashedEcommerceCore\Contracts\PaymentProviderContract;
 use RalphJSmit\Filament\MediaLibrary\Media\Models\MediaLibraryItem;
 use RalphJSmit\Filament\MediaLibrary\Media\Models\MediaLibraryFolder;
 
 class PayNL implements PaymentProviderContract
 {
-    const PSP = 'paynl';
+    public const PSP = 'paynl';
 
     public static function initialize(?string $siteId = null): void
     {
-        if (!$siteId) {
+        if (! $siteId) {
             $siteId = Sites::getActive();
         }
 
@@ -35,7 +34,7 @@ class PayNL implements PaymentProviderContract
 
     public static function isConnected(?string $siteId = null): bool
     {
-        if (!$siteId) {
+        if (! $siteId) {
             $siteId = Sites::getActive();
         }
 
@@ -60,7 +59,7 @@ class PayNL implements PaymentProviderContract
 
         self::initialize($siteId);
 
-        if (!Customsetting::get('paynl_connected', $site['id'])) {
+        if (! Customsetting::get('paynl_connected', $site['id'])) {
             return;
         }
 
@@ -71,7 +70,7 @@ class PayNL implements PaymentProviderContract
         }
 
         foreach ($allPaymentMethods as $allPaymentMethod) {
-            if (!$paymentMethod = PaymentMethod::where('psp', self::PSP)->where('psp_id', $allPaymentMethod['id'])->where('site_id', $site['id'])->first()) {
+            if (! $paymentMethod = PaymentMethod::where('psp', self::PSP)->where('psp_id', $allPaymentMethod['id'])->where('site_id', $site['id'])->first()) {
                 $paymentMethod = new PaymentMethod();
                 $paymentMethod->site_id = $site['id'];
                 $paymentMethod->available_from_amount = $allPaymentMethod['min_amount'] ?: 0;
@@ -87,7 +86,7 @@ class PayNL implements PaymentProviderContract
             Storage::disk('dashed')->put($imagePath, $image);
 
             $folder = MediaLibraryFolder::where('name', 'pay')->first();
-            if (!$folder) {
+            if (! $folder) {
                 $folder = new MediaLibraryFolder();
                 $folder->name = 'pay';
                 $folder->save();
@@ -112,7 +111,7 @@ class PayNL implements PaymentProviderContract
 
         self::initialize($siteId);
 
-        if (!Customsetting::get('paynl_connected', $site['id'])) {
+        if (! Customsetting::get('paynl_connected', $site['id'])) {
             return;
         }
 
@@ -123,7 +122,7 @@ class PayNL implements PaymentProviderContract
         }
 
         foreach ($allTerminals as $allTerminal) {
-            if (!$pinTerminal = PinTerminal::where('psp', self::PSP)->where('pin_terminal_id', $allTerminal['id'])->where('site_id', $site['id'])->first()) {
+            if (! $pinTerminal = PinTerminal::where('psp', self::PSP)->where('pin_terminal_id', $allTerminal['id'])->where('site_id', $site['id'])->first()) {
                 $pinTerminal = new PinTerminal();
                 $pinTerminal->site_id = $site['id'];
                 $pinTerminal->pin_terminal_id = $allTerminal['id'];
@@ -227,6 +226,7 @@ class PayNL implements PaymentProviderContract
     {
         try {
             $response = Http::get($orderPayment->attributes['terminal']['cancelUrl'])->json();
+
             return true;
         } catch (Exception $exception) {
             return false;
@@ -241,7 +241,7 @@ class PayNL implements PaymentProviderContract
 
         try {
             $payment = self::getTransaction($orderPayment);
-            if (!$payment) {
+            if (! $payment) {
                 return 'pending';
             }
         } catch (Exception $exception) {
@@ -261,18 +261,18 @@ class PayNL implements PaymentProviderContract
 
     public static function getPinTerminalOrderStatus(OrderPayment $orderPayment): string
     {
-//        try {
-            $response = Http::get($orderPayment->attributes['terminal']['statusUrl'])->json();
-            if($response['status'] == 'start'){
-                return 'pending';
-            }elseif($response['cancelled']) {
-                return 'cancelled';
-            }elseif($response['approved']) {
-                return 'paid';
-            }
-//        } catch (Exception $exception) {
-//            return 'pending';
-//        }
+        //        try {
+        $response = Http::get($orderPayment->attributes['terminal']['statusUrl'])->json();
+        if ($response['status'] == 'start') {
+            return 'pending';
+        } elseif ($response['cancelled']) {
+            return 'cancelled';
+        } elseif ($response['approved']) {
+            return 'paid';
+        }
+        //        } catch (Exception $exception) {
+        //            return 'pending';
+        //        }
     }
 
     public static function getTransaction(OrderPayment $orderPayment)
@@ -283,6 +283,7 @@ class PayNL implements PaymentProviderContract
 
         try {
             $payment = \Paynl\Transaction::get($orderPayment->psp_id);
+
             return $payment;
         } catch (Exception $exception) {
             return null;

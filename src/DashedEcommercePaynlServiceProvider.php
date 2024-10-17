@@ -2,11 +2,11 @@
 
 namespace Dashed\DashedEcommercePaynl;
 
-use Dashed\DashedEcommercePaynl\Commands\SyncPayNLPinTerminalsCommand;
 use Spatie\LaravelPackageTools\Package;
 use Illuminate\Console\Scheduling\Schedule;
 use Dashed\DashedEcommercePaynl\Classes\PayNL;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Dashed\DashedEcommercePaynl\Commands\SyncPayNLPinTerminalsCommand;
 use Dashed\DashedEcommercePaynl\Commands\SyncPayNLPaymentMethodsCommand;
 use Dashed\DashedEcommercePaynl\Filament\Pages\Settings\PayNLSettingsPage;
 
