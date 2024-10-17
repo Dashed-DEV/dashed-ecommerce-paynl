@@ -97,6 +97,7 @@ class PayNLSettingsPage extends Page
 
             if (Customsetting::get('paynl_connected', $site['id'])) {
                 PayNL::syncPaymentMethods($site['id']);
+                PayNL::syncPinTerminals();
             }
         }
 

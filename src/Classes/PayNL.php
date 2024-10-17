@@ -2,23 +2,30 @@
 
 namespace Dashed\DashedEcommercePaynl\Classes;
 
+use Dashed\DashedEcommerceCore\Contracts\PaymentProviderContract;
+use Dashed\DashedEcommerceCore\Models\PinTerminal;
 use Exception;
 use Dashed\DashedCore\Classes\Sites;
 use Dashed\DashedCore\Classes\Locales;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Dashed\DashedCore\Models\Customsetting;
 use Dashed\DashedEcommerceCore\Classes\Countries;
 use Dashed\DashedTranslations\Models\Translation;
 use Dashed\DashedEcommerceCore\Models\OrderPayment;
 use Dashed\DashedEcommerceCore\Models\PaymentMethod;
+use Paynl\Instore;
+use Paynl\Result\Instore\Terminals;
 use RalphJSmit\Filament\MediaLibrary\Media\Models\MediaLibraryItem;
 use RalphJSmit\Filament\MediaLibrary\Media\Models\MediaLibraryFolder;
 
-class PayNL
+class PayNL implements PaymentProviderContract
 {
-    public static function initialize($siteId = null)
+    const PSP = 'paynl';
+
+    public static function initialize(?string $siteId = null): void
     {
-        if (! $siteId) {
+        if (!$siteId) {
             $siteId = Sites::getActive();
         }
 
@@ -26,9 +33,9 @@ class PayNL
         \Paynl\Config::setServiceId(Customsetting::get('paynl_sl_code', $siteId));
     }
 
-    public static function isConnected($siteId = null)
+    public static function isConnected(?string $siteId = null): bool
     {
-        if (! $siteId) {
+        if (!$siteId) {
             $siteId = Sites::getActive();
         }
 
@@ -47,13 +54,13 @@ class PayNL
         }
     }
 
-    public static function syncPaymentMethods($siteId = null)
+    public static function syncPaymentMethods(?string $siteId = null): void
     {
         $site = Sites::get($siteId);
 
         self::initialize($siteId);
 
-        if (! Customsetting::get('paynl_connected', $site['id'])) {
+        if (!Customsetting::get('paynl_connected', $site['id'])) {
             return;
         }
 
@@ -64,17 +71,15 @@ class PayNL
         }
 
         foreach ($allPaymentMethods as $allPaymentMethod) {
-            if (! PaymentMethod::where('psp', 'paynl')->where('psp_id', $allPaymentMethod['id'])->count()) {
+            if (!$paymentMethod = PaymentMethod::where('psp', self::PSP)->where('psp_id', $allPaymentMethod['id'])->where('site_id', $site['id'])->first()) {
                 $paymentMethod = new PaymentMethod();
                 $paymentMethod->site_id = $site['id'];
                 $paymentMethod->available_from_amount = $allPaymentMethod['min_amount'] ?: 0;
                 $paymentMethod->psp_id = $allPaymentMethod['id'];
-                $paymentMethod->psp = 'paynl';
+                $paymentMethod->psp = self::PSP;
                 foreach (Locales::getLocales() as $locale) {
                     $paymentMethod->setTranslation('name', $locale['id'], $allPaymentMethod['visibleName']);
                 }
-            } else {
-                $paymentMethod = PaymentMethod::where('psp', 'paynl')->where('psp_id', $allPaymentMethod['id'])->first();
             }
 
             $image = file_get_contents('https://static.pay.nl/' . $allPaymentMethod['brand']['image']);
@@ -82,7 +87,7 @@ class PayNL
             Storage::disk('dashed')->put($imagePath, $image);
 
             $folder = MediaLibraryFolder::where('name', 'pay')->first();
-            if (! $folder) {
+            if (!$folder) {
                 $folder = new MediaLibraryFolder();
                 $folder->name = 'pay';
                 $folder->save();
@@ -101,9 +106,43 @@ class PayNL
         }
     }
 
-    public static function startTransaction(OrderPayment $orderPayment)
+    public static function syncPinTerminals(?string $siteId = null): void
     {
-        $orderPayment->psp = 'paynl';
+        $site = Sites::get($siteId);
+
+        self::initialize($siteId);
+
+        if (!Customsetting::get('paynl_connected', $site['id'])) {
+            return;
+        }
+
+        try {
+            $allTerminals = Instore::getAllTerminals()->getList() ?? [];
+        } catch (Exception $exception) {
+            $allTerminals = [];
+        }
+
+        foreach ($allTerminals as $allTerminal) {
+            if (!$pinTerminal = PinTerminal::where('psp', self::PSP)->where('pin_terminal_id', $allTerminal['id'])->where('site_id', $site['id'])->first()) {
+                $pinTerminal = new PinTerminal();
+                $pinTerminal->site_id = $site['id'];
+                $pinTerminal->pin_terminal_id = $allTerminal['id'];
+                $pinTerminal->psp = self::PSP;
+                foreach (Locales::getLocales() as $locale) {
+                    $pinTerminal->setTranslation('name', $locale['id'], $allTerminal['name']);
+                }
+            }
+            $pinTerminal->attributes = [
+                'state' => $allTerminal['state'],
+                'ecrProtocol' => $allTerminal['ecrProtocol'],
+            ];
+            $pinTerminal->save();
+        }
+    }
+
+    public static function startTransaction(OrderPayment $orderPayment): array
+    {
+        $orderPayment->psp = self::PSP;
         $orderPayment->save();
 
         $siteId = Sites::getActive();
@@ -125,11 +164,14 @@ class PayNL
             );
         }
 
-        $result = \Paynl\Transaction::start([
+        $transactionData = [
             'amount' => number_format($orderPayment->amount, 2, '.', ''),
             'returnUrl' => route('dashed.frontend.checkout.complete') . '?orderId=' . $orderPayment->order->hash . '&paymentId=' . $orderPayment->hash,
             'ipaddress' => request()->ip(),
-            'paymentMethod' => $orderPayment->paymentMethod->psp_id,
+            'paymentMethod' => $orderPayment->paymentMethod->pinTerminal ? 1927 : $orderPayment->paymentMethod->psp_id,
+            'bank' => $orderPayment->paymentMethod->pinTerminal->pin_terminal_id ?? null,
+//            'paymentMethod' => $orderPayment->paymentMethod->psp_id,
+//            'paymentMethod' => $orderPayment->paymentMethod->pinTerminal->pin_terminal_id,
             'currency' => 'EUR',
             'testmode' => Customsetting::get('paynl_test_mode', $siteId, false) ? true : false,
 
@@ -165,15 +207,30 @@ class PayNL
                 'city' => $orderPayment->order->invoice_city ?: $orderPayment->order->city,
                 'country' => Countries::getCountryIsoCode($orderPayment->order->invoice_country ?: $orderPayment->order->country),
             ],
-        ]);
+        ];
+
+        $result = \Paynl\Transaction::start($transactionData);
 
         $orderPayment->psp_id = $result->getTransactionId();
+        $orderPayment->attributes = [
+            'terminal' => $result->getData()['terminal'] ?? [],
+        ];
         $orderPayment->save();
 
         return [
             'transaction' => $result,
             'redirectUrl' => $result->getRedirectUrl(),
         ];
+    }
+
+    public static function cancelPinTerminalTransaction(OrderPayment $orderPayment): bool
+    {
+        try {
+            $response = Http::get($orderPayment->attributes['terminal']['cancelUrl'])->json();
+            return true;
+        } catch (Exception $exception) {
+            return false;
+        }
     }
 
     public static function getOrderStatus(OrderPayment $orderPayment): string
@@ -183,7 +240,10 @@ class PayNL
         self::initialize($site);
 
         try {
-            $payment = \Paynl\Transaction::get($orderPayment->psp_id);
+            $payment = self::getTransaction($orderPayment);
+            if (!$payment) {
+                return 'pending';
+            }
         } catch (Exception $exception) {
             return 'pending';
         }
@@ -196,6 +256,36 @@ class PayNL
             return 'cancelled';
         } else {
             return 'pending';
+        }
+    }
+
+    public static function getPinTerminalOrderStatus(OrderPayment $orderPayment): string
+    {
+//        try {
+            $response = Http::get($orderPayment->attributes['terminal']['statusUrl'])->json();
+            if($response['status'] == 'start'){
+                return 'pending';
+            }elseif($response['cancelled']) {
+                return 'cancelled';
+            }elseif($response['approved']) {
+                return 'paid';
+            }
+//        } catch (Exception $exception) {
+//            return 'pending';
+//        }
+    }
+
+    public static function getTransaction(OrderPayment $orderPayment)
+    {
+        $site = Sites::getActive();
+
+        self::initialize($site);
+
+        try {
+            $payment = \Paynl\Transaction::get($orderPayment->psp_id);
+            return $payment;
+        } catch (Exception $exception) {
+            return null;
         }
     }
 }

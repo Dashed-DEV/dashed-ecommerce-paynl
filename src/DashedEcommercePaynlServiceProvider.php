@@ -2,6 +2,7 @@
 
 namespace Dashed\DashedEcommercePaynl;
 
+use Dashed\DashedEcommercePaynl\Commands\SyncPayNLPinTerminalsCommand;
 use Spatie\LaravelPackageTools\Package;
 use Illuminate\Console\Scheduling\Schedule;
 use Dashed\DashedEcommercePaynl\Classes\PayNL;
@@ -18,6 +19,7 @@ class DashedEcommercePaynlServiceProvider extends PackageServiceProvider
         $this->app->booted(function () {
             $schedule = app(Schedule::class);
             $schedule->command(SyncPayNLPaymentMethodsCommand::class)->daily();
+            $schedule->command(SyncPayNLPinTerminalsCommand::class)->daily();
         });
     }
 
