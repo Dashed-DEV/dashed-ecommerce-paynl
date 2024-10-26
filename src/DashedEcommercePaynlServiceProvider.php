@@ -18,8 +18,10 @@ class DashedEcommercePaynlServiceProvider extends PackageServiceProvider
     {
         $this->app->booted(function () {
             $schedule = app(Schedule::class);
-            $schedule->command(SyncPayNLPaymentMethodsCommand::class)->daily();
-            $schedule->command(SyncPayNLPinTerminalsCommand::class)->daily();
+            $schedule->command(SyncPayNLPaymentMethodsCommand::class)
+                ->everyFifteenMinutes();
+            $schedule->command(SyncPayNLPinTerminalsCommand::class)
+                ->everyFifteenMinutes();
         });
     }
 
@@ -51,6 +53,7 @@ class DashedEcommercePaynlServiceProvider extends PackageServiceProvider
             ->name('dashed-ecommerce-paynl')
             ->hasCommands([
                 SyncPayNLPaymentMethodsCommand::class,
+                SyncPayNLPinTerminalsCommand::class,
             ]);
     }
 }
