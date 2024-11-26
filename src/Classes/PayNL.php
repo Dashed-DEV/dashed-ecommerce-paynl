@@ -24,7 +24,7 @@ class PayNL implements PaymentProviderContract
 
     public static function initialize(?string $siteId = null): void
     {
-        if (! $siteId) {
+        if (!$siteId) {
             $siteId = Sites::getActive();
         }
 
@@ -34,7 +34,7 @@ class PayNL implements PaymentProviderContract
 
     public static function isConnected(?string $siteId = null): bool
     {
-        if (! $siteId) {
+        if (!$siteId) {
             $siteId = Sites::getActive();
         }
 
@@ -59,7 +59,7 @@ class PayNL implements PaymentProviderContract
 
         self::initialize($siteId);
 
-        if (! Customsetting::get('paynl_connected', $site['id'])) {
+        if (!Customsetting::get('paynl_connected', $site['id'])) {
             return;
         }
 
@@ -70,7 +70,7 @@ class PayNL implements PaymentProviderContract
         }
 
         foreach ($allPaymentMethods as $allPaymentMethod) {
-            if (! $paymentMethod = PaymentMethod::where('psp', self::PSP)->where('psp_id', $allPaymentMethod['id'])->where('site_id', $site['id'])->first()) {
+            if (!$paymentMethod = PaymentMethod::where('psp', self::PSP)->where('psp_id', $allPaymentMethod['id'])->where('site_id', $site['id'])->first()) {
                 $paymentMethod = new PaymentMethod();
                 $paymentMethod->site_id = $site['id'];
                 $paymentMethod->available_from_amount = $allPaymentMethod['min_amount'] ?: 0;
@@ -81,35 +81,35 @@ class PayNL implements PaymentProviderContract
                 }
             }
 
-            if ($allPaymentMethod['brand']['image'] ?? false && ! $paymentMethod->image) {
+            if ($allPaymentMethod['brand']['image'] ?? false && !$paymentMethod->image) {
                 $paymentMethod->image = mediaHelper()->uploadFromPath('https://static.pay.nl/' . $allPaymentMethod['brand']['image'], 'paynl', true);
             }
             $paymentMethod->save();
 
-            //            $image = file_get_contents('https://static.pay.nl/' . $allPaymentMethod['brand']['image']);
-            //            if ($image) {
-            //                $imagePath = '/dashed/payment-methods/paynl/' . $allPaymentMethod['id'] . '.png';
-            //                Storage::disk('dashed')->put($imagePath, $image);
+//            $image = file_get_contents('https://static.pay.nl/' . $allPaymentMethod['brand']['image']);
+//            if ($image) {
+//                $imagePath = '/dashed/payment-methods/paynl/' . $allPaymentMethod['id'] . '.png';
+//                Storage::disk('dashed')->put($imagePath, $image);
 
-            //                $folder = MediaLibraryFolder::where('name', 'pay')->first();
-            //                if (!$folder) {
-            //                    $folder = new MediaLibraryFolder();
-            //                    $folder->name = 'pay';
-            //                    $folder->save();
-            //                }
-            //                $filamentMediaLibraryItem = new MediaLibraryItem();
-            //                $filamentMediaLibraryItem->uploaded_by_user_id = null;
-            //                $filamentMediaLibraryItem->folder_id = $folder->id;
-            //                $filamentMediaLibraryItem->save();
-            //
-            //                $filamentMediaLibraryItem
-            //                    ->addMediaFromDisk($imagePath, 'dashed')
-            //                    ->toMediaCollection($filamentMediaLibraryItem->getMediaLibraryCollectionName());
+//                $folder = MediaLibraryFolder::where('name', 'pay')->first();
+//                if (!$folder) {
+//                    $folder = new MediaLibraryFolder();
+//                    $folder->name = 'pay';
+//                    $folder->save();
+//                }
+//                $filamentMediaLibraryItem = new MediaLibraryItem();
+//                $filamentMediaLibraryItem->uploaded_by_user_id = null;
+//                $filamentMediaLibraryItem->folder_id = $folder->id;
+//                $filamentMediaLibraryItem->save();
+//
+//                $filamentMediaLibraryItem
+//                    ->addMediaFromDisk($imagePath, 'dashed')
+//                    ->toMediaCollection($filamentMediaLibraryItem->getMediaLibraryCollectionName());
 
-            //                $paymentMethod->image = $filamentMediaLibraryItem->id;
-            //            }
+//                $paymentMethod->image = $filamentMediaLibraryItem->id;
+//            }
 
-            //            $paymentMethod->save();
+//            $paymentMethod->save();
         }
     }
 
@@ -119,7 +119,7 @@ class PayNL implements PaymentProviderContract
 
         self::initialize($siteId);
 
-        if (! Customsetting::get('paynl_connected', $site['id'])) {
+        if (!Customsetting::get('paynl_connected', $site['id'])) {
             return;
         }
 
@@ -131,7 +131,7 @@ class PayNL implements PaymentProviderContract
 
         if (is_array($allTerminals)) {
             foreach ($allTerminals as $allTerminal) {
-                if (! $pinTerminal = PinTerminal::where('psp', self::PSP)->where('pin_terminal_id', $allTerminal['id'])->where('site_id', $site['id'])->first()) {
+                if (!$pinTerminal = PinTerminal::where('psp', self::PSP)->where('pin_terminal_id', $allTerminal['id'])->where('site_id', $site['id'])->first()) {
                     $pinTerminal = new PinTerminal();
                     $pinTerminal->site_id = $site['id'];
                     $pinTerminal->pin_terminal_id = $allTerminal['id'];
@@ -253,7 +253,7 @@ class PayNL implements PaymentProviderContract
 
         try {
             $payment = self::getTransaction($orderPayment);
-            if (! $payment) {
+            if (!$payment) {
                 return 'pending';
             }
         } catch (Exception $exception) {
@@ -273,18 +273,20 @@ class PayNL implements PaymentProviderContract
 
     public static function getPinTerminalOrderStatus(OrderPayment $orderPayment): string
     {
-        //        try {
-        $response = Http::get($orderPayment->attributes['terminal']['statusUrl'])->json();
-        if ($response['status'] == 'start') {
+        try {
+            $response = Http::get($orderPayment->attributes['terminal']['statusUrl'])->json();
+            if ($response['cancelled'] || $response['error'] == 1) {
+                return 'cancelled';
+            } elseif ($response['approved']) {
+                return 'paid';
+            } elseif ($response['status'] == 'start') {
+                return 'pending';
+            } else {
+                return 'pending';
+            }
+        } catch (Exception $exception) {
             return 'pending';
-        } elseif ($response['cancelled']) {
-            return 'cancelled';
-        } elseif ($response['approved']) {
-            return 'paid';
         }
-        //        } catch (Exception $exception) {
-        //            return 'pending';
-        //        }
     }
 
     public static function getTransaction(OrderPayment $orderPayment)
