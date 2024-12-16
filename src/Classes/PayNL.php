@@ -2,7 +2,6 @@
 
 namespace Dashed\DashedEcommercePaynl\Classes;
 
-use Dashed\DashedEcommerceCore\Classes\ShoppingCart;
 use Exception;
 use Paynl\Instore;
 use Dashed\DashedCore\Classes\Sites;
@@ -14,6 +13,7 @@ use Dashed\DashedEcommerceCore\Classes\Countries;
 use Dashed\DashedTranslations\Models\Translation;
 use Dashed\DashedEcommerceCore\Models\PinTerminal;
 use Dashed\DashedEcommerceCore\Models\OrderPayment;
+use Dashed\DashedEcommerceCore\Classes\ShoppingCart;
 use Dashed\DashedEcommerceCore\Models\PaymentMethod;
 use Dashed\DashedEcommerceCore\Contracts\PaymentProviderContract;
 use RalphJSmit\Filament\MediaLibrary\Media\Models\MediaLibraryItem;
