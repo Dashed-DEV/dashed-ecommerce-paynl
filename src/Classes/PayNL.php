@@ -2,6 +2,7 @@
 
 namespace Dashed\DashedEcommercePaynl\Classes;
 
+use Dashed\DashedEcommerceCore\Classes\ShoppingCart;
 use Exception;
 use Paynl\Instore;
 use Dashed\DashedCore\Classes\Sites;
@@ -175,7 +176,7 @@ class PayNL implements PaymentProviderContract
 
         $transactionData = [
             'amount' => number_format($orderPayment->amount, 2, '.', ''),
-            'returnUrl' => route('dashed.frontend.checkout.complete') . '?orderId=' . $orderPayment->order->hash . '&paymentId=' . $orderPayment->hash,
+            'returnUrl' => url(ShoppingCart::getCompleteUrl()) . '?orderId=' . $orderPayment->order->hash . '&paymentId=' . $orderPayment->hash,
             'ipaddress' => request()->ip(),
             'paymentMethod' => $orderPayment->paymentMethod->pinTerminal ? 1927 : $orderPayment->paymentMethod->psp_id,
             'bank' => $orderPayment->paymentMethod->pinTerminal->pin_terminal_id ?? null,
