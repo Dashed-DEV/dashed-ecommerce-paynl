@@ -2,6 +2,7 @@
 
 namespace Dashed\DashedEcommercePaynl;
 
+use Dashed\DashedCore\DashedCorePlugin;
 use Spatie\LaravelPackageTools\Package;
 use Illuminate\Console\Scheduling\Schedule;
 use Dashed\DashedEcommercePaynl\Classes\PayNL;
@@ -55,5 +56,9 @@ class DashedEcommercePaynlServiceProvider extends PackageServiceProvider
                 SyncPayNLPaymentMethodsCommand::class,
                 SyncPayNLPinTerminalsCommand::class,
             ]);
+
+        cms()->builder('plugins', [
+            new DashedEcommercePaynlPlugin(),
+        ]);
     }
 }
