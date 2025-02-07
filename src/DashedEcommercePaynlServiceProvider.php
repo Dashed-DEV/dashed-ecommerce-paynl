@@ -27,17 +27,7 @@ class DashedEcommercePaynlServiceProvider extends PackageServiceProvider
 
     public function configurePackage(Package $package): void
     {
-        cms()->builder(
-            'settingPages',
-            array_merge(cms()->builder('settingPages'), [
-                'paynl' => [
-                    'name' => 'PayNL',
-                    'description' => 'Link PayNL aan je webshop',
-                    'icon' => 'banknotes',
-                    'page' => PayNLSettingsPage::class,
-                ],
-            ])
-        );
+        cms()->registerSettingsPage(PayNLSettingsPage::class, 'PayNL', 'banknotes', 'Link PayNL aan je webshop');
 
         ecommerce()->builder(
             'paymentServiceProviders',
