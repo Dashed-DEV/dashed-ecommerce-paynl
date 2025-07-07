@@ -186,8 +186,9 @@ class PayNL implements PaymentProviderContract
             'testmode' => Customsetting::get('paynl_test_mode', $siteId, false) ? true : false,
 
             'exchangeUrl' => route('dashed.frontend.checkout.exchange'),
-            'description' => Translation::get('order-by-store', 'orders', 'Order by :storeName:', 'text', [
+            'description' => Translation::get('order-by-store', 'orders', 'Order :orderId: by :storeName:', 'text', [
                 'storeName' => Customsetting::get('site_name'),
+                'orderId' => $orderPayment->order->id,
             ]),
             'orderNumber' => $orderPayment->order->id,
             'products' => $paynlProducts,
